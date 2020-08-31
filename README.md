@@ -33,9 +33,9 @@
             "data": "it is animal"  
         },  
         {  
-        	"type": "human",  
-			"data": "he is human"   
-		}  
+            "type": "human",  
+	    "data": "he is human"   
+	}  
     ],  
     "lion": "Nothing"  
 }  
