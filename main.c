@@ -5,26 +5,26 @@
 
 /* run this program using the console pauser or add your own getch, system("pause") or input loop */
 
-struct XZNode{
-	struct XZNode* parent;
-	struct XZNode* children;
-	struct XZNode* next;
+struct JCNode{
+	struct JCNode* parent;
+	struct JCNode* children;
+	struct JCNode* next;
 	char* key;
 	int templateIndex;
 	int link;
 };
 
-struct XZSlist{
+struct JCSlist{
 	char* value;
-	struct XZSlist* next;
+	struct JCSlist* next;
 };
 
-int XZIndex = 1;
+int JCIndex = 1;
 
-struct XZNode* follow(struct XZNode* root, char* key){ 
+struct JCNode* follow(struct JCNode* root, char* key){ 
 	
-	struct XZNode* child = root->children;
-	struct XZNode* prev = child;
+	struct JCNode* child = root->children;
+	struct JCNode* prev = child;
 	while(child){
 		if(strcmp(child->key, key) == 0){
 			return child;
@@ -35,7 +35,7 @@ struct XZNode* follow(struct XZNode* root, char* key){
 		}
 	} 
 	if(!prev){
-		child = malloc(sizeof(struct XZNode));
+		child = malloc(sizeof(struct JCNode));
 		child->parent = root;
 		child->key = key;
 		child->children = NULL;
@@ -43,7 +43,7 @@ struct XZNode* follow(struct XZNode* root, char* key){
 		root->children = child;
 	}
 	else{
-		prev->next = malloc(sizeof(struct XZNode));
+		prev->next = malloc(sizeof(struct JCNode));
 		prev->next->parent = root;
 		prev->next->key = key;
 		prev->next->children = NULL;
@@ -53,8 +53,8 @@ struct XZNode* follow(struct XZNode* root, char* key){
 	return child; 
 }
 
-void process(struct XZNode* root, cJSON* value){
-	struct XZNode* node = root;
+void process(struct JCNode* root, cJSON* value){
+	struct JCNode* node = root;
 	if(value){
 		while(value){
 			if(value->string){
@@ -68,24 +68,24 @@ void process(struct XZNode* root, cJSON* value){
 	}
 }
 
-void setLink(struct XZNode* root, int link){
+void setLink(struct JCNode* root, int link){
 	while(root){
-		root->templateIndex = XZIndex;
+		root->templateIndex = JCIndex;
 		root->link = link;
 		if(root->children){
 			if(root->children->next){
-				XZIndex += 1;
+				JCIndex += 1;
 			}
 			setLink(root->children, root->templateIndex);
 		}
 		root = root->next;
 		if(root){
-			XZIndex += 1; 
+			JCIndex += 1; 
 		}
 	}
 }
 
-void getLink(struct XZNode* root, int *array){
+void getLink(struct JCNode* root, int *array){
 	while(root){
 		if(root->templateIndex != root->link){
 			array[root->templateIndex - 1] = root->link;
@@ -97,10 +97,10 @@ void getLink(struct XZNode* root, int *array){
 	}
 }
 
-void getKeyByIndex(struct XZNode* root, int i, struct XZSlist* list){
+void getKeyByIndex(struct JCNode* root, int i, struct JCSlist* list){
 	if(root){
 		while(root && root->templateIndex == i){
-			struct XZSlist* str = malloc(sizeof(struct XZSlist));
+			struct JCSlist* str = malloc(sizeof(struct JCSlist));
 			str->next = NULL;
 			str->value = root->key;
 			list->next = str;
@@ -114,18 +114,18 @@ void getKeyByIndex(struct XZNode* root, int i, struct XZSlist* list){
 	} 
 }
 
-cJSON* createTemplates(struct XZNode* root){
+cJSON* createTemplates(struct JCNode* root){
 	
 	int* links;
-	links = (int *)malloc(sizeof(int)*XZIndex);
+	links = (int *)malloc(sizeof(int)*JCIndex);
 	getLink(root, links);
 	
 	cJSON* templates;
 	
 	templates = cJSON_CreateArray();
 	int i;
-	for(i = 0; i < XZIndex; i++){
-		struct XZSlist* list = malloc(sizeof(struct XZSlist));
+	for(i = 0; i < JCIndex; i++){
+		struct JCSlist* list = malloc(sizeof(struct JCSlist));
 		list->value = "";
 		list->next = NULL;
 		getKeyByIndex(root, i+1, list);
@@ -144,7 +144,7 @@ cJSON* createTemplates(struct XZNode* root){
 	return templates;  
 }
 
-int findKeyNum(struct XZNode* root, char* lastKey){
+int findKeyNum(struct JCNode* root, char* lastKey){
 	if(!root || !lastKey){
 		return 0;
 	}
@@ -154,7 +154,7 @@ int findKeyNum(struct XZNode* root, char* lastKey){
 	return findKeyNum(root->children, lastKey) | findKeyNum(root->next, lastKey);
 }
 
-cJSON* createValues(cJSON* value, struct XZNode* root){
+cJSON* createValues(cJSON* value, struct JCNode* root){
 	cJSON* result = cJSON_CreateObject();
 	
 	char* lastKey = "";
@@ -179,7 +179,7 @@ cJSON* createValues(cJSON* value, struct XZNode* root){
 	return result;
 }
 
-int initXZNode(struct XZNode* root, cJSON* value){
+int initJCNode(struct JCNode* root, cJSON* value){
 	
 	root->parent = NULL;
 	root->key = "";
@@ -193,9 +193,9 @@ int initXZNode(struct XZNode* root, cJSON* value){
 }
 
 cJSON* Compress(cJSON* value){
-	XZIndex = 1; 
-	struct XZNode* root = malloc(sizeof(struct XZNode));
-	int index = initXZNode(root, value);
+	JCIndex = 1; 
+	struct JCNode* root = malloc(sizeof(struct JCNode));
+	int index = initJCNode(root, value);
 	
 	cJSON* templates = createTemplates(root->children);
 	cJSON* values = createValues(value, root->children);
@@ -215,18 +215,18 @@ cJSON* Compress(cJSON* value){
 	}
 }
 
-void getKeys(cJSON* templates, struct XZSlist** keys, int KeySize){
+void getKeys(cJSON* templates, struct JCSlist** keys, int KeySize){
 	int i, j;
 	for(i = 0; i < KeySize; i++){
 		cJSON* key = cJSON_GetArrayItem(templates, i);
 		int itemSize = cJSON_GetArraySize(key);
 		cJSON* item = cJSON_GetArrayItem(key, 0);
 		int t = item->valueint;
-		struct XZSlist* curr = keys[i];
+		struct JCSlist* curr = keys[i];
 		if(t){
-			struct XZSlist* prev = keys[t-1]->next;
+			struct JCSlist* prev = keys[t-1]->next;
 			while(prev){
-				struct XZSlist *tmp = malloc(sizeof(struct XZSlist));
+				struct JCSlist *tmp = malloc(sizeof(struct JCSlist));
 				tmp->value = prev->value;
 				tmp->next = NULL;
 				curr->next = tmp;
@@ -236,7 +236,7 @@ void getKeys(cJSON* templates, struct XZSlist** keys, int KeySize){
 		}
 		for(j = 1; j < itemSize; j++){
 			item = cJSON_GetArrayItem(key, j);
-			struct XZSlist *tmp = malloc(sizeof(struct XZSlist));
+			struct JCSlist *tmp = malloc(sizeof(struct JCSlist));
 			tmp->value = item->valuestring;
 			tmp->next = NULL;
 			curr->next = tmp;
@@ -246,7 +246,7 @@ void getKeys(cJSON* templates, struct XZSlist** keys, int KeySize){
 	
 }
 
-cJSON* getValues(struct XZSlist** keys, const cJSON* values){
+cJSON* getValues(struct JCSlist** keys, const cJSON* values){
 	
 	int i;
 	cJSON* result;
@@ -258,7 +258,7 @@ cJSON* getValues(struct XZSlist** keys, const cJSON* values){
 
 	if(keyNum){
 		result = cJSON_CreateObject();
-		struct XZSlist* list = keys[keyNum - 1]->next;
+		struct JCSlist* list = keys[keyNum - 1]->next;
 		for(i = 1; i < size; i++){ 
 			cJSON* item = cJSON_GetArrayItem(values, i);
 			int ssize = cJSON_GetArraySize(item);
@@ -298,10 +298,10 @@ cJSON* expand(cJSON* templates, cJSON* values){
 	int i;
 	
 	int KeySize = cJSON_GetArraySize(templates);
-	struct XZSlist** keys;
-	keys =  malloc(sizeof(struct XZSlist*)*KeySize);
+	struct JCSlist** keys;
+	keys =  malloc(sizeof(struct JCSlist*)*KeySize);
 	for(i = 0; i < KeySize; i++){
-		keys[i] = malloc(sizeof(struct XZSlist));
+		keys[i] = malloc(sizeof(struct JCSlist));
 		keys[i]->value = "";
 		keys[i]->next = NULL;
 	}
