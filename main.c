@@ -323,8 +323,8 @@ cJSON* Expand(cJSON* json){
 }
 
 int main(int argc, char *argv[]) {
-	
-	char* uncom = "{\"Alert\":[{\"type\":\"KBMouse\",\"data\":\"LOC_OPTIONS_KEY_V\",\"information\":{\"name\":\"xuzhi\",\"number\":\"123456789\"}}],\"Attack\":[{\"type\":\"KBMouse\",\"data\":\"LOC_OPTIONS_KEY_A\",\"dream\":\"superman\"}],\"AutoExplore\":[{\"type\":\"KBMouse\",\"data\":\"LOC_OPTIONS_KEY_E\"},{\"type\":\"KBCat\",\"data\":\"LOC_OPTIONS_KEY_C\"}],\"AutoFind\":\"test\"}";
+
+	char* uncom = "{\"cats\":[{\"type\":\"animal\",\"data\":\"it is cat\",\"information\":{\"name\":\"eryue\",\"number\":\"1234567890\"}}],\"dogs\":[{\"type\":\"animal\",\"data\":\"it is dog\",\"dream\":\"clever\"}],\"human\":[{\"type\":\"animal\",\"data\":\"it is animal\"},{\"type\":\"human\",\"data\":\"he is human\"}],\"lion\":\"Nothing\"}";
 	cJSON *json = cJSON_Parse(uncom);
 	json = json->child;
 	cJSON* com = Compress(json);
@@ -333,13 +333,13 @@ int main(int argc, char *argv[]) {
 	cJSON* decom = Expand(com);
 	char* decomtext = cJSON_Print(decom);
 	printf("decomJson: %s\n", decomtext);
-	
-	char* comStr = "{\"t\":[[0,\"Alert\",\"Attack\",\"AutoExplore\",\"AutoFind\"],[0,\"type\",\"data\"],[2,\"information\"],[2,\"dream\"],[0,\"name\",\"number\"]],\"v\":[1,[0,[3,\"KBMouse\",\"LOC_OPTIONS_KEY_V\",[5,\"xuzhi\",\"123456789\"]]],[0,[4,\"KBMouse\",\"LOC_OPTIONS_KEY_A\",\"superman\"]],[0,[2,\"KBMouse\",\"LOC_OPTIONS_KEY_E\"],[2,\"KBCat\",\"LOC_OPTIONS_KEY_C\"]],\"test\"]}";
+
+	char* comStr = "comJson:{\"t\":[[0,\"cats\",\"dogs\",\"human\",\"lion\"],[0,\"type\",\"data\"],[2,\"information\"],[2,\"dream\"],[0,\"name\",\"number\"]],\"v\":[1,[0,[3,\"animal\",\"it is cat\",[5,\"eryue\",\"1234567890\"]]],[0,[4,\"animal\",\"it is dog\",\"clever\"]],[0,[2,\"animal\",\"it is animal\"],[2,\"human\",\"he is human\"]],\"Nothing\"]}";
 	cJSON* comcJS = cJSON_Parse(comStr);
 	cJSON* decomcJS = Expand(comcJS);
 	char* decomStr = cJSON_Print(decomcJS);
 	printf("decomcJS: %s\n", decomStr);
-	
+
 	cJSON_Delete(com);
 	cJSON_Delete(decom);
 	return 0;
